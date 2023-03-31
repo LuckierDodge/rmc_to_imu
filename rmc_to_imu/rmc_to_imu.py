@@ -14,15 +14,15 @@ class Rmc_To_Imu(Node):
 
     def nmea_callback(self, msg):
         sentence = msg.sentence
-        if sentence.startswith("RMC", 3):
+        if "RMC" in sentence:
             split = sentence.split(',')
             cog = split[8]
-            self.get_logger().info(f"{split}")
+            # self.get_logger().info(f"{split}")
             if cog != '':
                 q = quaternion_from_euler(
                     0,
                     0,
-                    float(cog) * 3.1415926535 / 180
+                    -1 * float(cog) * 3.1415926535 / 180 + (3.1415926535 / 2) # Convert to ENU
                 )
                 self.imu_publisher_.publish(
                     Imu(
@@ -34,7 +34,7 @@ class Rmc_To_Imu(Node):
                         )
                     )
                 )
-                self.get_logger().info(f"{cog}, {float(cog) * 3.1415926535 / 180}, ({q[2]}, {q[3]})")
+                # self.get_logger().info(f"{cog}, {float(cog) * 3.1415926535 / 180}, ({q[2]}, {q[3]})")
 
 def main(args=None):
     rclpy.init(args=args)
